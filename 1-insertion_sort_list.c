@@ -7,35 +7,37 @@
  */
 void insertion_sort_list(listint_t **list)
 {
-	listint_t *sorted, *unsorted, *sorted_copy, *sorted_copy_prev;
+	listint_t *sorted, *unsorted, *node_cpy1, *node_cpy2;
 
-	if (*list)
+	if (!list || !(*list)->next)
+		return;
+
+	sorted = *list;
+	unsorted = sorted->next;
+	while (unsorted)
 	{
-		sorted = *list;
-		unsorted = sorted->next;
-		while (unsorted)
+		if (unsorted->n < sorted->n)
 		{
-			if (unsorted->n < sorted->n)
-			{
-				node_swap(sorted, unsorted);
-				unsorted = unsorted->next;
-				sorted = unsorted->prev;
-				sorted_copy = sorted;
-				sorted_copy_prev = sorted_copy->prev;
-				print_list(*list);
-
-				while (sorted_copy_prev && sorted_copy->n < sorted_copy_prev->n)
-				{
-					node_swap(sorted_copy_prev, sorted_copy);
-					if (sorted_copy_prev == *list)
-						*list = sorted_copy;
-					sorted_copy_prev = sorted_copy->prev;
-					print_list(*list);
-				}
-			}
-			sorted = unsorted;
+			node_swap(sorted, unsorted);
+			if (*list == sorted)
+				*list = unsorted;
 			unsorted = unsorted->next;
+			sorted = unsorted->prev;
+			print_list(*list);
+
+			node_cpy1 = sorted;
+			node_cpy2 = node_cpy1->prev;
+			while (node_cpy2 && node_cpy1->n < node_cpy2->n)
+			{
+				node_swap(node_cpy2, node_cpy1);
+				if (node_cpy2 == *list)
+					*list = node_cpy1;
+				print_list(*list);
+				node_cpy2 = node_cpy1->prev;
+			}
 		}
+		sorted = unsorted;
+		unsorted = unsorted->next;
 	}
 }
 
@@ -48,10 +50,10 @@ void node_swap(listint_t *sorted, listint_t *unsorted)
 {
 	sorted->next = unsorted->next;
 	unsorted->prev = sorted->prev;
-	sorted->prev = unsorted;
-	unsorted->next = sorted;
-	if (sorted->next)
-		sorted->next->prev = sorted;
 	if (unsorted->prev)
 		unsorted->prev->next = unsorted;
+	sorted->prev = unsorted;
+	if (sorted->next)
+		sorted->next->prev = sorted;
+	unsorted->next = sorted;
 }
